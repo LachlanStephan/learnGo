@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/rs/cors"
 )
 
 type config struct {
@@ -39,10 +41,12 @@ func main() {
 		infoLog: infoLog,
 	}
 
+	handler := cors.Default().Handler(mux)
+
 	srv := &http.Server{
 		Addr: cnf.addr,
 		ErrorLog: errorLog,
-		Handler: mux,
+		Handler: handler,
 	}
 
 	mux.HandleFunc("/blogs/get", app.blogGet)
