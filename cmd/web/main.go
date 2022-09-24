@@ -10,18 +10,18 @@ import (
 )
 
 type config struct {
-	addr string
+	addr      string
 	staticDir string
-}	
+}
 
 type application struct {
 	errorLog *log.Logger
-	infoLog *log.Logger	
+	infoLog  *log.Logger
 }
 
 var (
-	cnf config
-	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	cnf      config
+	infoLog  = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Llongfile)
 )
 
@@ -32,29 +32,20 @@ func setFlags() {
 }
 
 func main() {
-	mux := http.NewServeMux()
-
 	setFlags()
 
 	app := &application{
 		errorLog: errorLog,
-		infoLog: infoLog,
+		infoLog:  infoLog,
 	}
-
-	handler := cors.Default().Handler(mux)
 
 	srv := &http.Server{
-		Addr: cnf.addr,
+		Addr:     cnf.addr,
 		ErrorLog: errorLog,
-		Handler: handler,
+		Handler:  cors.Default().Handler(app.routes()),
 	}
-
-	mux.HandleFunc("/blogs/get", app.blogGet)
-	mux.HandleFunc("/blogs/post", app.blogPost)
-	mux.HandleFunc("/", app.home)
 
 	infoLog.Printf("starting server on %s", cnf.addr)
 	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
-
