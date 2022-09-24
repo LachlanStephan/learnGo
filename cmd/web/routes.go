@@ -5,9 +5,12 @@ import "net/http"
 func (app *application) routes() *http.ServeMux {
 	mux := http.NewServeMux()
 
+	fileServer := http.FileServer(http.Dir("./ui/static"))
+	mux.Handle("/static", http.StripPrefix("/static", fileServer))
+
 	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/blog/get", app.blogGet)
-	mux.HandleFunc("/blog/post", app.blogPost)
+	mux.HandleFunc("/blog/view", app.blogView)
+	mux.HandleFunc("/blog/create", app.blogCreate)
 
 	return mux
 }
