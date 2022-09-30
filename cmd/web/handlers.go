@@ -14,7 +14,7 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Dispaly blog with id of %id...", id)
+	fmt.Fprintf(w, "Display blog with id of %id...", id)
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {

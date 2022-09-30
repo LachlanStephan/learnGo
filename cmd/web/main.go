@@ -1,22 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/LachlanStephan/ls_server/internal/models"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/cors"
 )
 
 type config struct {
 	addr      string
 	staticDir string
+	dsn 	  string
 }
 
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	users	 *models.UserModel
 }
 
 var (
@@ -26,17 +32,38 @@ var (
 )
 
 func setFlags() {
-	flag.StringVar(&cnf.addr, "addr", ":4000", "HTTP network address")
+	flag.StringVar(&cnf.addr, "addr", ":8080", "HTTP network address")
 	flag.StringVar(&cnf.staticDir, "static-dir", "./ui/static", "path to static assets")
+	flag.StringVar(&cnf.dsn, "dsn", "root:@/ls_server?parseTime=true", "update this later - MySQL data source name")
 	flag.Parse()
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 func main() {
 	setFlags()
 
+	db, err := openDB(cnf.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer db.Close()
+
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		users: &models.UserModel{DB: db},
 	}
 
 	srv := &http.Server{
@@ -46,6 +73,6 @@ func main() {
 	}
 
 	infoLog.Printf("starting server on %s", cnf.addr)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
