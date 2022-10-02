@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/LachlanStephan/ls_server/internal/models"
+	"github.com/LachlanStephan/ls_server/internal/models/users"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/cors"
@@ -22,7 +22,7 @@ type config struct {
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	users	 *models.UserModel
+	users	 *users.UserModel
 }
 
 var (
@@ -63,7 +63,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		users: &models.UserModel{DB: db},
+		users: &users.UserModel{DB: db},
 	}
 
 	srv := &http.Server{

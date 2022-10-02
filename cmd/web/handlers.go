@@ -27,6 +27,22 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Create a new blog..."))
 }
 
+func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	// we don't need id returned so assign _ instead && return 201 if no err
+	_, err := app.users.Insert("hello", "there", true);
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.clientResponse(w, 201)
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.notFound(w)
