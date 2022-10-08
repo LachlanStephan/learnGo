@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/LachlanStephan/ls_server/internal/models/model_errors"
+	"github.com/LachlanStephan/ls_server/internal/models"
 )
 
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +19,7 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 
 	blog, err := app.blogs.Get(id)
 	if err != nil {
-		if errors.Is(err, model_errors.ErrNoRecord) {
+		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
 		} else {
 			app.serverError(w, err)
@@ -37,7 +37,13 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Create a new blog..."))
+	_, err := app.blogs.Insert(1, "some title", "this is an amazing blog post")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.clientResponse(w, 201)
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {

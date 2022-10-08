@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/LachlanStephan/ls_server/internal/models/model_errors"
+	"github.com/LachlanStephan/ls_server/internal/models"
 )
 
 type Blog struct {
@@ -23,7 +23,7 @@ type BlogModel struct {
 
 func (m *BlogModel) Insert(user_id int, title string, content string) (int, error) {
 	stmt := `INSERT INTO Blogs (User_id, Title, Content, Created_at) VALUES (?, ?, ?, UTC_TIMESTAMP())`
-	result, err := m.DB.Exec(stmt, title, content)
+	result, err := m.DB.Exec(stmt, user_id, title, content)
 	if err != nil {
 		return 0, err
 	}
@@ -46,7 +46,7 @@ func (m *BlogModel) Get(id int) (*Blog, error) {
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, model_errors.ErrNoRecord
+			return nil, models.ErrNoRecord
 		} else {
 			return nil, err
 		}
