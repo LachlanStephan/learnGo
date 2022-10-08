@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/LachlanStephan/ls_server/internal/models/model_errors"
 )
 
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
@@ -14,7 +17,17 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Display blog with id of %id...", id)
+	blog, err := app.blogs.Get(id)
+	if err != nil {
+		if errors.Is(err, model_errors.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	fmt.Fprintf(w, "%+v", blog)
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +40,12 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Create a new blog..."))
 }
 
+func (app *application) login(w http.ResponseWriter, r *http.Request) {
+	//
+}
+
+// will need to set sessions here or something
+// will also need to hash password
 func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
@@ -35,7 +54,7 @@ func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// we don't need id returned so assign _ instead && return 201 if no err
-	_, err := app.users.Insert("hello", "there", true);
+	_, err := app.users.Insert("hello", "there", true)
 	if err != nil {
 		app.serverError(w, err)
 		return

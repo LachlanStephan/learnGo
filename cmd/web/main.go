@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/LachlanStephan/ls_server/internal/models/blogs"
 	"github.com/LachlanStephan/ls_server/internal/models/users"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -16,13 +17,14 @@ import (
 type config struct {
 	addr      string
 	staticDir string
-	dsn 	  string
+	dsn       string
 }
 
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	users	 *users.UserModel
+	users    *users.UserModel
+	blogs    *blogs.BlogModel
 }
 
 var (
@@ -63,7 +65,8 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		users: &users.UserModel{DB: db},
+		users:    &users.UserModel{DB: db},
+		blogs:    &blogs.BlogModel{DB: db},
 	}
 
 	srv := &http.Server{

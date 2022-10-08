@@ -2,13 +2,17 @@ package blogs
 
 import (
 	"database/sql"
+	"errors"
 	"time"
+
+	"github.com/LachlanStephan/ls_server/internal/models/model_errors"
 )
 
 type Blog struct {
-	Blog_id int
-	Title string
-	Content string
+	Blog_id    int
+	User_id    int
+	Title      string
+	Content    string
 	Created_at time.Time
 	Updated_at time.Time
 }
@@ -17,9 +21,9 @@ type BlogModel struct {
 	DB *sql.DB
 }
 
-func (m *BlogModel) Insert(title string, content string) (int, error) {
-	stmt := `INSERT INTO Blogs (Title, Content, Created_at) VALUES (?, ?, UTC_TIMESTAMP())`
-	result, err := m.DB.Exec(stmt, title, content) 
+func (m *BlogModel) Insert(user_id int, title string, content string) (int, error) {
+	stmt := `INSERT INTO Blogs (User_id, Title, Content, Created_at) VALUES (?, ?, ?, UTC_TIMESTAMP())`
+	result, err := m.DB.Exec(stmt, title, content)
 	if err != nil {
 		return 0, err
 	}
@@ -28,6 +32,25 @@ func (m *BlogModel) Insert(title string, content string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	return int(id), nil
+}
+
+func (m *BlogModel) Get(id int) (*Blog, error) {
+	stmt := `SELECT Blog_id, User_id, Title, Content, Created_at, Updated_at FROM Blogs WHERE user_id = ?`
+
+	row := m.DB.QueryRow(stmt, id)
+
+	b := &Blog{}
+
+	err := row.Scan(&b.Blog_id, &b.User_id, &b.Title, &b.Content, &b.Created_at, &b.Updated_at)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model_errors.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+
+	return b, nil
 }
