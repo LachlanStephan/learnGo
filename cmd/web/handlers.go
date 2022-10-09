@@ -46,27 +46,22 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 	app.clientResponse(w, 201)
 }
 
-func (app *application) login(w http.ResponseWriter, r *http.Request) {
-	//
-}
+// not in use
+// func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != http.MethodPost {
+// 		w.Header().Set("Allow", http.MethodPost)
+// 		app.clientError(w, http.StatusMethodNotAllowed)
+// 		return
+// 	}
 
-// will need to set sessions here or something
-// will also need to hash password
-func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
-	// we don't need id returned so assign _ instead && return 201 if no err
-	_, err := app.users.Insert("hello", "there", true)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	app.clientResponse(w, 201)
-}
+// 	// we don't need id returned so assign _ instead && return 201 if no err
+// 	_, err := app.users.Insert("hello", "there", true)
+// 	if err != nil {
+// 		app.serverError(w, err)
+// 		return
+// 	}
+// 	app.clientResponse(w, 201)
+// }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -90,5 +85,30 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		app.serverError(w, err)
+	}
+}
+
+func (app *application) blog(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/blog" {
+		app.notFound(w)
+		return
+	}
+
+	files := []string {
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/partials/footer.tmpl.html",
+		"./ui/html/pages/blog.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
 	}
 }
