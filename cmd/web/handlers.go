@@ -69,23 +69,34 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
+	blogs, err := app.blogs.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
+	for _, blog := range blogs {
+		fmt.Fprintf(w, "%+v\n", blog)
 	}
+
+	// add back later
+	//	files := []string{
+	//		"./ui/html/base.tmpl.html",
+	//		"./ui/html/partials/nav.tmpl.html",
+	//		"./ui/html/partials/footer.tmpl.html",
+	//		"./ui/html/pages/home.tmpl.html",
+	//	}
+	//
+	//	ts, err := template.ParseFiles(files...)
+	//	if err != nil {
+	//		app.serverError(w, err)
+	//		return
+	//	}
+	//
+	//	err = ts.ExecuteTemplate(w, "base", nil)
+	//	if err != nil {
+	//		app.serverError(w, err)
+	//	}
 }
 
 func (app *application) blog(w http.ResponseWriter, r *http.Request) {
