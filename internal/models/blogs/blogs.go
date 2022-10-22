@@ -37,7 +37,7 @@ func (m *BlogModel) Insert(user_id int, title string, content string) (int, erro
 	return int(id), nil
 }
 
-func (m *BlogModel) Latest() ([]*Blog, error) {
+func (m *BlogModel) Recent() ([]*Blog, error) {
 	stmt := `SELECT blogs.Blog_id, blogs.User_id, blogs.Title, blogs.Content, blogs.Created_at, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 10`
 
 	rows, err := m.DB.Query(stmt)
@@ -68,9 +68,9 @@ func (m *BlogModel) Latest() ([]*Blog, error) {
 
 func (m *BlogModel) Get(id int) (*Blog, error) {
 	b := &Blog{}
-	stmt := `SELECT Blog_id, User_id, Title, Content, Created_at, Updated_at FROM blogs WHERE user_id = ?`
+	stmt := `SELECT Blogs.Blog_id, Blogs.User_id, Blogs.Title, Blogs.Content, Blogs.Created_at, Blogs.Updated_at, Users.FirstName, Users.LastName FROM blogs JOIN Users ON Blogs.User_id = Users.User_id WHERE Blog_id = ? AND Users.User_id = 1`
 
-	err := m.DB.QueryRow(stmt, id).Scan(&b.Blog_id, &b.User_id, &b.Title, &b.Content, &b.Created_at, &b.Updated_at)
+	err := m.DB.QueryRow(stmt, id).Scan(&b.Blog_id, &b.User_id, &b.Title, &b.Content, &b.Created_at, &b.Updated_at, &b.FirstName, &b.LastName)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

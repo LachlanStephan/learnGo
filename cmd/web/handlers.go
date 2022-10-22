@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -27,7 +26,25 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", blog)
+	// blog.Content -> deal with this being markdown and render it to html instead
+
+	files := []string{
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/pages/view.tmpl.html",
+		"./ui/html/partials/footer.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", blog)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
@@ -69,34 +86,35 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	blogs, err := app.blogs.Latest()
+	// blogs, err := app.blogs.Recent()
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
+
+	// for _, blog := range blogs {
+	// 	fmt.Fprintf(w, "%+v\n", blog)
+	// }
+
+	// add back later
+	files := []string{
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/pages/home.tmpl.html",
+		"./ui/html/partials/recent-blogs.tmpl.html",
+		"./ui/html/partials/footer.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	for _, blog := range blogs {
-		fmt.Fprintf(w, "%+v\n", blog)
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		app.serverError(w, err)
 	}
-
-	// add back later
-	//	files := []string{
-	//		"./ui/html/base.tmpl.html",
-	//		"./ui/html/partials/nav.tmpl.html",
-	//		"./ui/html/partials/footer.tmpl.html",
-	//		"./ui/html/pages/home.tmpl.html",
-	//	}
-	//
-	//	ts, err := template.ParseFiles(files...)
-	//	if err != nil {
-	//		app.serverError(w, err)
-	//		return
-	//	}
-	//
-	//	err = ts.ExecuteTemplate(w, "base", nil)
-	//	if err != nil {
-	//		app.serverError(w, err)
-	//	}
 }
 
 func (app *application) blog(w http.ResponseWriter, r *http.Request) {

@@ -11,7 +11,6 @@ import (
 	"github.com/LachlanStephan/ls_server/internal/models/users"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/rs/cors"
 )
 
 type config struct {
@@ -72,7 +71,7 @@ func main() {
 	srv := &http.Server{
 		Addr:     cnf.addr,
 		ErrorLog: errorLog,
-		Handler:  cors.Default().Handler(app.routes()),
+		Handler:  app.routes(),
 	}
 
 	infoLog.Printf("starting server on %s", cnf.addr)
