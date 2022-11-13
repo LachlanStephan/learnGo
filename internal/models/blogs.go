@@ -1,11 +1,9 @@
-package blogs
+package models
 
 import (
 	"database/sql"
 	"errors"
 	"time"
-
-	"github.com/LachlanStephan/ls_server/internal/models"
 )
 
 type Blog struct {
@@ -74,7 +72,7 @@ func (m *BlogModel) Get(id int) (*Blog, error) {
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, models.ErrNoRecord
+			return nil, ErrNoRecord
 		} else {
 			return nil, err
 		}

@@ -27,7 +27,6 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// blog.Content -> deal with this being markdown and render it to html instead
-
 	files := []string{
 		"./ui/html/base.tmpl.html",
 		"./ui/html/partials/nav.tmpl.html",
@@ -41,7 +40,12 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", blog)
+	// use a template to allow for multiple data sets to be executed - ts.ExecuteTemplate will only allow one dataset to be passed.
+	data := &blogTemplate{
+		Blog: blog,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
