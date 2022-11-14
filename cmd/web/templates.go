@@ -10,3 +10,7 @@ import (
 type blogTemplate struct{
 	Blog *models.Blog
 }
+
+type blogRecentTemplate struct{
+	Recent []*models.BlogRecent
+}

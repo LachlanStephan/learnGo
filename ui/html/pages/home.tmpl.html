@@ -18,4 +18,9 @@
 		coach for ~8 of those before switching to a career in software.
 	</li>
 </ul>
-{{template "recent-blogs"}} {{end}}
+
+<!-- Recent blogs -->
+<h2>Recent blogs</h2>
+{{range .Recent}}
+<a href="/blog/view?id={{.Blog_id}}">{{.Title}} - {{.FirstName}} {{.LastName}}</p>
+{{end}} {{end}}

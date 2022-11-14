@@ -67,6 +67,41 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 	app.clientResponse(w, 201)
 }
 
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		app.notFound(w)
+		return
+	}
+
+	blogs, err := app.blogs.Recent()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	files := []string{
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/pages/home.tmpl.html",
+		"./ui/html/partials/footer.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := &blogRecentTemplate{
+		Recent: blogs,
+	}
+	
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
 // not in use
 // func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 // 	if r.Method != http.MethodPost {
@@ -83,43 +118,6 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 // 	}
 // 	app.clientResponse(w, 201)
 // }
-
-func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
-
-	// blogs, err := app.blogs.Recent()
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
-
-	// for _, blog := range blogs {
-	// 	fmt.Fprintf(w, "%+v\n", blog)
-	// }
-
-	// add back later
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-		"./ui/html/partials/recent-blogs.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-	}
-}
 
 func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/blog" {

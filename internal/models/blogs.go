@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"html/template"
 	"time"
 )
 
@@ -12,9 +13,16 @@ type Blog struct {
 	FirstName  string
 	LastName   string
 	Title      string
-	Content    string
+	Content    template.HTML
 	Created_at time.Time
 	Updated_at time.Time
+}
+ 
+type BlogRecent struct {
+	Blog_id int
+	Title 	string
+	FirstName 	string
+	LastName 	string
 }
 
 type BlogModel struct {
@@ -35,8 +43,8 @@ func (m *BlogModel) Insert(user_id int, title string, content string) (int, erro
 	return int(id), nil
 }
 
-func (m *BlogModel) Recent() ([]*Blog, error) {
-	stmt := `SELECT blogs.Blog_id, blogs.User_id, blogs.Title, blogs.Content, blogs.Created_at, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 10`
+func (m *BlogModel) Recent() ([]*BlogRecent, error) {
+	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 10`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
@@ -45,12 +53,12 @@ func (m *BlogModel) Recent() ([]*Blog, error) {
 
 	defer rows.Close()
 
-	blogs := []*Blog{}
+	blogs := []*BlogRecent{}
 
 	for rows.Next() {
-		b := &Blog{}
+		b := &BlogRecent{}
 
-		err = rows.Scan(&b.Blog_id, &b.User_id, &b.Title, &b.Content, &b.Created_at, &b.FirstName, &b.LastName)
+		err = rows.Scan(&b.Blog_id, &b.Title, &b.FirstName, &b.LastName)
 		if err != nil {
 			return nil, err
 		}
