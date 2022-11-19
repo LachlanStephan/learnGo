@@ -1,3 +1,5 @@
 {{define "title"}}Blog{{end}} {{define "main"}}
 <h1>Lachlan Stephan - Blog</h1>
-{{end}}
+{{range .List}}
+<a href="/blog/view?id={{.Blog_id}}">{{.Title}} - {{.FirstName}} {{.LastName}}</p>
+{{end}} {{end}}

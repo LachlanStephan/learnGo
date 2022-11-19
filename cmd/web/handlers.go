@@ -102,6 +102,41 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) blog(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/blog" {
+		app.notFound(w)
+		return
+	}
+
+	blogs, err := app.blogs.ListAll()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	files := []string {
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/partials/footer.tmpl.html",
+		"./ui/html/pages/blog.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	data := &blogListTemplate{
+		List: blogs,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
+
 // not in use
 // func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
 // 	if r.Method != http.MethodPost {
@@ -118,28 +153,3 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 // 	}
 // 	app.clientResponse(w, 201)
 // }
-
-func (app *application) blog(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/blog" {
-		app.notFound(w)
-		return
-	}
-
-	files := []string {
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-		"./ui/html/pages/blog.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-}

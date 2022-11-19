@@ -18,7 +18,7 @@ type Blog struct {
 	Updated_at time.Time
 }
  
-type BlogRecent struct {
+type BlogLink struct {
 	Blog_id int
 	Title 	string
 	FirstName 	string
@@ -43,8 +43,8 @@ func (m *BlogModel) Insert(user_id int, title string, content string) (int, erro
 	return int(id), nil
 }
 
-func (m *BlogModel) Recent() ([]*BlogRecent, error) {
-	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 10`
+func (m *BlogModel) ListAll() ([]*BlogLink, error) {
+	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
@@ -53,10 +53,39 @@ func (m *BlogModel) Recent() ([]*BlogRecent, error) {
 
 	defer rows.Close()
 
-	blogs := []*BlogRecent{}
+	blogs := []*BlogLink{}
 
 	for rows.Next() {
-		b := &BlogRecent{}
+		b := &BlogLink{}
+
+		err = rows.Scan(&b.Blog_id, &b.Title, &b.FirstName, &b.LastName)
+		if err != nil {
+			return nil, err
+		}
+		blogs = append(blogs, b)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return blogs, nil
+} 
+
+func (m *BlogModel) Recent() ([]*BlogLink, error) {
+	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 5`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	blogs := []*BlogLink{}
+
+	for rows.Next() {
+		b := &BlogLink{}
 
 		err = rows.Scan(&b.Blog_id, &b.Title, &b.FirstName, &b.LastName)
 		if err != nil {

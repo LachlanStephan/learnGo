@@ -12,5 +12,9 @@ type blogTemplate struct{
 }
 
 type blogRecentTemplate struct{
-	Recent []*models.BlogRecent
+	Recent []*models.BlogLink
+}
+
+type blogListTemplate struct{
+	List []*models.BlogLink
 }
