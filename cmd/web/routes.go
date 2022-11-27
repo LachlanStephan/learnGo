@@ -12,7 +12,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/blog", app.blog)
 	mux.HandleFunc("/blog/view", app.blogView)
 	mux.HandleFunc("/blog/create", app.blogCreate)
-	// mux.HandleFunc("/user/create", app.userCreate)
+	mux.HandleFunc("/admin", app.admin)
 
 	return mux
 }

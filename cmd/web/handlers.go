@@ -156,19 +156,16 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// not in use
-// func (app *application) userCreate(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		w.Header().Set("Allow", http.MethodPost)
-// 		app.clientError(w, http.StatusMethodNotAllowed)
-// 		return
-// 	}
+func (app *application) admin(w http.ResponseWriter, r *http.Request) {
+	/*
+		this will be an admin view
+		just get the right templates/html and show it
+	*/
+}
 
-// 	// we don't need id returned so assign _ instead && return 201 if no err
-// 	_, err := app.users.Insert("hello", "there", true)
-// 	if err != nil {
-// 		app.serverError(w, err)
-// 		return
-// 	}
-// 	app.clientResponse(w, 201)
-// }
+func (app *application) adminLogin(password string) bool {
+	return false
+	/*
+		hash password and see if matches the db for admin user
+	*/
+}
