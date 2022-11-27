@@ -1,6 +1,5 @@
 {{define "title"}}Blog #{{.Blog.Blog_id}}{{end}} {{define "main"}}
 <h1>{{.Blog.Title}}</h1>
 <p>Author: {{.Blog.FirstName}} {{.Blog.LastName}}</p>
-<time>Created: {{.Blog.Created_at}}</time>
-<pre><code>{{.Blog.Content}}</code></pre>
-{{end}}
+<time>Created: {{.Blog.FormattedDate}}</time>
+{{.Blog.Content}} {{end}}

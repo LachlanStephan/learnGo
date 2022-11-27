@@ -3,4 +3,12 @@
 }
 body {
 	padding: 1em;
+	max-width: 1000px;
+}
+
+pre {
+	background-color: lightgray;
+	padding: 0.5rem;
+	border-radius: 2px;
+	overflow: auto;
 }

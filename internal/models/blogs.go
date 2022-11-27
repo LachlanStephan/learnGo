@@ -8,21 +8,22 @@ import (
 )
 
 type Blog struct {
-	Blog_id    int
-	User_id    int
-	FirstName  string
-	LastName   string
-	Title      string
-	Content    template.HTML
-	Created_at time.Time
-	Updated_at time.Time
+	Blog_id       int
+	User_id       int
+	FirstName     string
+	LastName      string
+	Title         string
+	Content       template.HTML
+	Created_at    time.Time
+	Updated_at    time.Time
+	FormattedDate string
 }
- 
+
 type BlogLink struct {
-	Blog_id int
-	Title 	string
-	FirstName 	string
-	LastName 	string
+	Blog_id   int
+	Title     string
+	FirstName string
+	LastName  string
 }
 
 type BlogModel struct {
@@ -43,7 +44,7 @@ func (m *BlogModel) Insert(user_id int, title string, content string) (int, erro
 	return int(id), nil
 }
 
-func (m *BlogModel) ListAll() ([]*BlogLink, error) {
+func (m *BlogModel) GetAll() ([]*BlogLink, error) {
 	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at`
 
 	rows, err := m.DB.Query(stmt)
@@ -70,7 +71,7 @@ func (m *BlogModel) ListAll() ([]*BlogLink, error) {
 	}
 
 	return blogs, nil
-} 
+}
 
 func (m *BlogModel) Recent() ([]*BlogLink, error) {
 	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 5`

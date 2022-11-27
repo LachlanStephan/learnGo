@@ -5,9 +5,28 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
 )
+
+func formatCreatedAt(created_at time.Time) string {
+	fallback := "Unknown"
+	if created_at.IsZero() {
+		return fallback
+	}
+
+	f := created_at.Format("2006-01-02")
+	if len(f) > 0 {
+		parts := strings.Split(f, "-")
+		if len(parts) > 2 {
+			return parts[2] + "-" + parts[1] + "-" + parts[0]
+		}
+	}
+
+	return fallback
+}
 
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -26,7 +45,9 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// blog.Content -> deal with this being markdown and render it to html instead
+	fd := formatCreatedAt(blog.Created_at)
+	blog.FormattedDate = fd
+
 	files := []string{
 		"./ui/html/base.tmpl.html",
 		"./ui/html/partials/nav.tmpl.html",
@@ -63,8 +84,6 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	app.clientResponse(w, 201)
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +114,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := &blogRecentTemplate{
 		Recent: blogs,
 	}
-	
+
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
@@ -108,13 +127,13 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	blogs, err := app.blogs.ListAll()
+	blogs, err := app.blogs.GetAll()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	files := []string {
+	files := []string{
 		"./ui/html/base.tmpl.html",
 		"./ui/html/partials/nav.tmpl.html",
 		"./ui/html/partials/footer.tmpl.html",
