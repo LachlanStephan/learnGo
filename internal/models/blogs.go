@@ -74,7 +74,7 @@ func (m *BlogModel) GetAll() ([]*BlogLink, error) {
 }
 
 func (m *BlogModel) Recent() ([]*BlogLink, error) {
-	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 5`
+	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC LIMIT 3`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {

@@ -22,5 +22,7 @@
 <!-- Recent blogs -->
 <h2>Recent blogs</h2>
 {{range .BlogLinks}}
-<a href="/blog/view?id={{.Blog_id}}">{{.Title}} - {{.FirstName}} {{.LastName}}</p>
+<a href="/blog/view?id={{.Blog_id}}">
+	<p>{{.Title}} - {{.FirstName}} {{.LastName}}</p>
+</a>
 {{end}} {{end}}

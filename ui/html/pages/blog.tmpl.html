@@ -1,5 +1,6 @@
 {{define "title"}}Blog{{end}} {{define "main"}}
 <h1>Lachlan Stephan - Blog</h1>
+<h2>These are my opinions and are not authoritative</h2>
 {{range .BlogLinks}}
 <a href="/blog/view?id={{.Blog_id}}">{{.Title}} - {{.FirstName}} {{.LastName}}</p>
 {{end}} {{end}}
