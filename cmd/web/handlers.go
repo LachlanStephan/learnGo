@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
@@ -48,28 +47,9 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	fd := formatCreatedAt(blog.Created_at)
 	blog.FormattedDate = fd
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/view.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	// use a template to allow for multiple data sets to be executed - ts.ExecuteTemplate will only allow one dataset to be passed.
-	data := &blogTemplate{
+	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{
 		Blog: blog,
-	}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	})
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
@@ -98,27 +78,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &blogRecentTemplate{
-		Recent: blogs,
-	}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{
+		BlogLinks: blogs,
+	})
 }
 
 func (app *application) blog(w http.ResponseWriter, r *http.Request) {
@@ -133,27 +95,9 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/partials/footer.tmpl.html",
-		"./ui/html/pages/blog.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	data := &blogListTemplate{
-		List: blogs,
-	}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.render(w, http.StatusOK, "blog.tmpl.html", &templateData{
+		BlogLinks: blogs,
+	})
 }
 
 func (app *application) admin(w http.ResponseWriter, r *http.Request) {
