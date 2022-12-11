@@ -1,5 +1,10 @@
 {{define "title"}}Blog #{{.Blog.Blog_id}}{{end}} {{define "main"}}
 <h1>{{.Blog.Title}}</h1>
 <p>Author: {{.Blog.FirstName}} {{.Blog.LastName}}</p>
-<time>Created: {{.Blog.FormattedDate}}</time>
+<!-- 
+  pipeline funciton formatCreatedAt -> this can also be chained multiple times
+  with multiple funcitons. Each using the last value returned from the 
+  previous function 
+-->
+<time>Created: {{.Blog.Created_at | formatCreatedAt}}</time>
 {{.Blog.Content}} {{end}}

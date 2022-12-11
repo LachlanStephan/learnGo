@@ -4,28 +4,9 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
 )
-
-func formatCreatedAt(created_at time.Time) string {
-	fallback := "Unknown"
-	if created_at.IsZero() {
-		return fallback
-	}
-
-	f := created_at.Format("2006-01-02")
-	if len(f) > 0 {
-		parts := strings.Split(f, "-")
-		if len(parts) > 2 {
-			return parts[2] + "-" + parts[1] + "-" + parts[0]
-		}
-	}
-
-	return fallback
-}
 
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -43,9 +24,6 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	fd := formatCreatedAt(blog.Created_at)
-	blog.FormattedDate = fd
 
 	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{
 		Blog: blog,

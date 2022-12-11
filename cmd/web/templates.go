@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
 )
@@ -13,6 +14,20 @@ import (
 type templateData struct {
 	Blog      *models.Blog
 	BlogLinks []*models.BlogLink
+}
+
+func formatCreatedAt(t time.Time) string {
+	if t.IsZero() {
+		return "Unknown"
+	}
+
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+// creating an object to store helper functions that the templates may use
+// these must return only 1 value || 1 value && err
+var functions = template.FuncMap{
+	"formatCreatedAt": formatCreatedAt,
 }
 
 // create in memory cache to store templates and prevent repeating ourselves in the handler funcs
@@ -27,7 +42,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		ts, err := template.ParseFiles("./ui/html/base.tmpl.html")
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl.html")
 		if err != nil {
 			return nil, err
 		}
