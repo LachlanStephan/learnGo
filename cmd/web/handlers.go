@@ -79,6 +79,12 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) admin(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/admin" {
+		app.notFound(w)
+		return
+	}
+
+	app.render(w, http.StatusOK, "admin.tmpl.html", nil)
 	/*
 		this will be an admin view
 		just get the right templates/html and show it
