@@ -30,6 +30,8 @@ type BlogModel struct {
 	DB *sql.DB
 }
 
+// for now can hardcode the user id as mine
+// do this unti there is some auth added
 func (m *BlogModel) Insert(user_id int, title string, content string) (int, error) {
 	stmt := `INSERT INTO Blogs (User_id, Title, Content, Created_at, Updated_at) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := m.DB.Exec(stmt, user_id, title, content)

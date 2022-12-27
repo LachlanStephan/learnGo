@@ -10,10 +10,10 @@ import (
 
 // list of templates used across the site
 // can compose multiple sets of data here
-
 type templateData struct {
-	Blog      *models.Blog
-	BlogLinks []*models.BlogLink
+	Blog        *models.Blog
+	BlogLinks   []*models.BlogLink
+	CurrentYear int
 }
 
 func formatCreatedAt(t time.Time) string {
@@ -21,7 +21,7 @@ func formatCreatedAt(t time.Time) string {
 		return "Unknown"
 	}
 
-	return t.Format("02 Jan 2006 at 15:04")
+	return t.Format("02 Jan 2006 at 15:04") + " (UTC)"
 }
 
 // creating an object to store helper functions that the templates may use

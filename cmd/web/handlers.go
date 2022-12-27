@@ -33,17 +33,8 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
-	/*
-		Plan:
-			this will display a form to create the blog
-
-			on this form we will have a username and password field as part of the form
-			all fields are required
-			we will check if the username matches db username
-			we will hash password and see if it matches db password
-
-			in future we would also have userCreate route so others could publish blogs -> this would require the admin login and some kind of approval setting/method
-	*/
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "blog-create.tmpl.html", data)
 }
 
 func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -65,9 +56,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{
-		BlogLinks: blogs,
-	})
+	data := app.newTemplateData(r)
+	data.BlogLinks = blogs
+
+	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
 
 func (app *application) blog(w http.ResponseWriter, r *http.Request) {
@@ -87,18 +79,18 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *application) admin(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/admin" {
-		app.notFound(w)
-		return
-	}
+// func (app *application) admin(w http.ResponseWriter, r *http.Request) {
+// if r.URL.Path != "/admin" {
+// app.notFound(w)
+// return
+// }
 
-	app.render(w, http.StatusOK, "admin.tmpl.html", nil)
-	/*
-		this will be an admin view
-		just get the right templates/html and show it
-	*/
-}
+// app.render(w, http.StatusOK, "admin.tmpl.html", nil)
+// /*
+// this will be an admin view
+// just get the right templates/html and show it
+// */
+// }
 
 func (app *application) adminLogin(password string) bool {
 	return false
