@@ -1,6 +1,11 @@
 {{define "title"}}Create a Blog{{end}} {{define "main"}}
 <form action="/blog/create" method="POST">
 	<div>
+		<label>User id:</label>
+		<br />
+		<input type="text" name="user_id" />
+	</div>
+	<div>
 		<label>Title:</label>
 		<br />
 		<input type="text" name="title" />
@@ -15,3 +20,7 @@
 	</div>
 </form>
 {{end}}
+<!--
+  TODO:
+  Need to get rid of user_id field -> this can done once auth code is added and we can check user_id via session
+-->

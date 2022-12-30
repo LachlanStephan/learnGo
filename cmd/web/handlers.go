@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,15 +39,28 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
-	user_id := 1
-	title := "some title"
-	content := "this is a blog post"
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	_, err := app.blogs.Insert(user_id, title, content)
+	user_id, err := strconv.Atoi(r.PostForm.Get("user_id"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+
+	id, err := app.blogs.Insert(user_id, title, content)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	http.Redirect(w, r, fmt.Sprintf("/blog/view/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {

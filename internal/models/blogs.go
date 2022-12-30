@@ -31,7 +31,7 @@ type BlogModel struct {
 }
 
 // for now can hardcode the user id as mine
-// do this unti there is some auth added
+// do this until there is some auth added
 func (m *BlogModel) Insert(user_id int, title string, content string) (int, error) {
 	stmt := `INSERT INTO Blogs (User_id, Title, Content, Created_at, Updated_at) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := m.DB.Exec(stmt, user_id, title, content)
@@ -47,7 +47,7 @@ func (m *BlogModel) Insert(user_id int, title string, content string) (int, erro
 }
 
 func (m *BlogModel) GetAll() ([]*BlogLink, error) {
-	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at`
+	stmt := `SELECT blogs.Blog_id, blogs.Title, users.FirstName, users.LastName FROM blogs JOIN Users ON Users.user_id = blogs.user_id ORDER BY blogs.Created_at DESC`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
