@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
 	"github.com/julienschmidt/httprouter"
@@ -34,6 +36,12 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+	// check that the user is logged in here
+	// if not
+	// redirect them to login page
+	// this can be done once auth is implemented
+
 	data := app.newTemplateData(r)
 	app.render(w, http.StatusOK, "blog-create.tmpl.html", data)
 }
@@ -45,14 +53,32 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	formErrors := make(map[string]string)
+
+	// move this validation to
+	// validation.go file later
 	user_id, err := strconv.Atoi(r.PostForm.Get("user_id"))
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
+		formErrors["user_id"] = "Invalid user_id"
 	}
 
 	title := r.PostForm.Get("title")
 	content := r.PostForm.Get("content")
+
+	// move this validation to
+	// validation.go file later
+	if strings.TrimSpace(title) == "" || utf8.RuneCountInString(title) > 50 {
+		formErrors["title"] = "Invalid title"
+	}
+
+	if strings.TrimSpace(content) == "" {
+		formErrors["content"] = "Invalid content"
+	}
+
+	if len(formErrors) > 0 {
+		fmt.Fprint(w, formErrors)
+		return
+	}
 
 	id, err := app.blogs.Insert(user_id, title, content)
 	if err != nil {
