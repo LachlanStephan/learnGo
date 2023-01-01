@@ -14,6 +14,7 @@ type templateData struct {
 	Blog        *models.Blog
 	BlogLinks   []*models.BlogLink
 	CurrentYear int
+	Form        any
 }
 
 func formatCreatedAt(t time.Time) string {

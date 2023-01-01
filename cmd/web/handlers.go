@@ -12,6 +12,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type blogCreateForm struct {
+	Title      string
+	Content    string
+	User_id    int
+	FormErrors map[string]string
+}
+
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
@@ -43,6 +50,12 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 	// this can be done once auth is implemented
 
 	data := app.newTemplateData(r)
+	data.Form = blogCreateForm{
+		User_id: 1,
+		Title:   "TITLE TEST",
+		Content: "TEST",
+	}
+
 	app.render(w, http.StatusOK, "blog-create.tmpl.html", data)
 }
 
@@ -53,13 +66,17 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	formErrors := make(map[string]string)
+	form := blogCreateForm{
+		FormErrors: map[string]string{},
+	}
 
 	// move this validation to
 	// validation.go file later
 	user_id, err := strconv.Atoi(r.PostForm.Get("user_id"))
 	if err != nil {
-		formErrors["user_id"] = "Invalid user_id"
+		form.FormErrors["user_id"] = "Invalid user_id"
+	} else {
+		form.User_id = user_id
 	}
 
 	title := r.PostForm.Get("title")
@@ -68,19 +85,27 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 	// move this validation to
 	// validation.go file later
 	if strings.TrimSpace(title) == "" || utf8.RuneCountInString(title) > 50 {
-		formErrors["title"] = "Invalid title"
+		form.FormErrors["title"] = "Invalid title"
+	} else {
+		form.Title = title
 	}
 
 	if strings.TrimSpace(content) == "" {
-		formErrors["content"] = "Invalid content"
+		form.FormErrors["content"] = "Invalid content"
+	} else {
+		form.Content = content
 	}
 
-	if len(formErrors) > 0 {
-		fmt.Fprint(w, formErrors)
+	if len(form.FormErrors) > 0 {
+		data := app.newTemplateData(r)
+		data.Form = form
+		// problem HERE
+		fmt.Fprint(w)
+		app.render(w, http.StatusUnprocessableEntity, "blog-create.tmpl.html", data)
 		return
 	}
 
-	id, err := app.blogs.Insert(user_id, title, content)
+	id, err := app.blogs.Insert(form.User_id, form.Title, form.Content)
 	if err != nil {
 		app.serverError(w, err)
 		return

@@ -2,18 +2,27 @@
 <form action="/blog/create" method="POST">
 	<div>
 		<label>User id:</label>
+		{{with .Form.FormErrors.user_id}}
+		<label class="error">{{.}}</label>
+		{{end}}
 		<br />
-		<input type="text" name="user_id" />
+		<input type="text" name="user_id" value="{{.Form.User_id}}" />
 	</div>
 	<div>
-		<label>Title:</label>
+		<label>title:</label>
+		{{with .Form.FormErrors.title}}
+		<label class="error">{{.}}</label>
+		{{end}}
 		<br />
-		<input type="text" name="title" />
+		<input type="text" name="title" value="{{.Form.Title}}" />
 	</div>
 	<div>
-		<label>Content:</label>
+		<label>content:</label>
+		{{with .Form.FormErrors.content}}
+		<label class="error">{{.}}</label>
+		{{end}}
 		<br />
-		<textarea name="content"></textarea>
+		<textarea name="content">{{.Form.Content}}</textarea>
 	</div>
 	<div>
 		<input type="submit" value="Publish blog" />
