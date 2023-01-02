@@ -5,18 +5,17 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
+	"github.com/LachlanStephan/ls_server/internal/validator"
 	"github.com/julienschmidt/httprouter"
 )
 
 type blogCreateForm struct {
-	Title      string
-	Content    string
-	User_id    int
-	FormErrors map[string]string
+	Title   string
+	Content string
+	User_id int
+	validator.Validator
 }
 
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
@@ -66,41 +65,26 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := blogCreateForm{
-		FormErrors: map[string]string{},
-	}
+	form := blogCreateForm{}
+	form.User_id = validator.CastUserId(r.PostForm.Get("user_id"))
+	form.Title = r.PostForm.Get("title")
+	form.Content = r.PostForm.Get("content")
 
-	// move this validation to
-	// validation.go file later
-	user_id, err := strconv.Atoi(r.PostForm.Get("user_id"))
+	validPublishers, err := app.users.GetAdminUsers()
 	if err != nil {
-		form.FormErrors["user_id"] = "Invalid user_id"
-	} else {
-		form.User_id = user_id
+		app.serverError(w, err)
+		return
 	}
 
-	title := r.PostForm.Get("title")
-	content := r.PostForm.Get("content")
+	form.CheckField(validator.ValidUserId(form.User_id, validPublishers), "user_id", "You do not have permission to publish")
+	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Title, 50), "title", "Title cannot have more than 50 chars")
+	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Content, 50), "content", "Title cannot have more than 50 chars")
 
-	// move this validation to
-	// validation.go file later
-	if strings.TrimSpace(title) == "" || utf8.RuneCountInString(title) > 50 {
-		form.FormErrors["title"] = "Invalid title"
-	} else {
-		form.Title = title
-	}
-
-	if strings.TrimSpace(content) == "" {
-		form.FormErrors["content"] = "Invalid content"
-	} else {
-		form.Content = content
-	}
-
-	if len(form.FormErrors) > 0 {
+	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
-		// problem HERE
-		fmt.Fprint(w)
 		app.render(w, http.StatusUnprocessableEntity, "blog-create.tmpl.html", data)
 		return
 	}
