@@ -50,9 +50,7 @@ func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Form = blogCreateForm{
-		User_id: 1,
-		Title:   "TITLE TEST",
-		Content: "TEST",
+		User_id: 1, // replace hardcoded id with id from session
 	}
 
 	app.render(w, http.StatusOK, "blog-create.tmpl.html", data)

@@ -8,3 +8,8 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
 )
+
+require (
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20221223131519-238b052508b6 // indirect
+	github.com/alexedwards/scs/v2 v2.5.0 // indirect
+)

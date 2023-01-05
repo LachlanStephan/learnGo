@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -56,9 +57,14 @@ func CastUserId(userId string) int {
 }
 
 func ValidUserId(userId int, validUsers []int) bool {
-	if userId == 0 {
+	if userId == 0 && !isInt(userId) {
 		return false
 	}
 
 	return PermittedInt(userId, validUsers...)
+}
+
+func isInt(n any) bool {
+	t := reflect.TypeOf(n).Kind()
+	return t == reflect.Int
 }

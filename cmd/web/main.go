@@ -7,9 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/LachlanStephan/ls_server/internal/models"
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 )
 
 type config struct {
@@ -19,11 +23,12 @@ type config struct {
 }
 
 type application struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	users         *models.UserModel
-	blogs         *models.BlogModel
-	templateCache map[string]*template.Template
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	users          *models.UserModel
+	blogs          *models.BlogModel
+	templateCache  map[string]*template.Template
+	SessionManager *scs.SessionManager
 }
 
 var (
@@ -51,6 +56,13 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
+func setSessionManager(db *sql.DB) *scs.SessionManager {
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+	return sessionManager
+}
+
 func main() {
 	setFlags()
 
@@ -66,12 +78,15 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	sessionManager := setSessionManager(db)
+
 	app := &application{
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		users:         &models.UserModel{DB: db},
-		blogs:         &models.BlogModel{DB: db},
-		templateCache: templateCache,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		users:          &models.UserModel{DB: db},
+		blogs:          &models.BlogModel{DB: db},
+		templateCache:  templateCache,
+		SessionManager: sessionManager,
 	}
 
 	srv := &http.Server{
