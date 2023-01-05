@@ -36,9 +36,10 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{
-		Blog: blog,
-	})
+	data := app.newTemplateData(r)
+	data.Blog = blog
+
+	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +94,8 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.SessionManager.Put(r.Context(), "flash", "Blog created successfully")
+
 	http.Redirect(w, r, fmt.Sprintf("/blog/view/%d", id), http.StatusSeeOther)
 }
 
@@ -139,9 +142,9 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 // */
 // }
 
-func (app *application) adminLogin(password string) bool {
-	return false
-	/*
-		hash password and see if matches the db for admin user
-	*/
-}
+// func (app *application) adminLogin(password string) bool {
+// 	return false
+/*
+	hash password and see if matches the db for admin user
+*/
+// }

@@ -21,10 +21,17 @@
 			href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300&display=swap"
 			rel="stylesheet"
 		/>
+
+		<!-- Link to any javascript we may need -->
+		<script src="/static/js/main.js" type="text/javascript" defer></script>
 	</head>
 	<body>
 		{{template "nav" .}}
-		<main>{{template "main" .}}</main>
+		<main>
+			{{with .Flash}}
+			<p class="flash">{{.}}</p>
+			{{end}} {{template "main" .}}
+		</main>
 		{{template "footer" .}}
 	</body>
 </html>

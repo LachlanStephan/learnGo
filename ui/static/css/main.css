@@ -3,7 +3,8 @@
 }
 body {
 	padding: 1em;
-	max-width: 1000px;
+	margin: 0 auto;
+	width: 50%;
 }
 
 pre {
@@ -11,4 +12,18 @@ pre {
 	padding: 0.5rem;
 	border-radius: 2px;
 	overflow: auto;
+}
+
+.flash {
+	padding: 1rem;
+	border: 1px solid lightgray;
+	border-radius: 2px;
+	margin: 1rem 0;
+}
+
+@media (max-width: 800px) {
+	body {
+		width: unset;
+		margin: unset;
+	}
 }
