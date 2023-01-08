@@ -90,9 +90,13 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:     cnf.addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+		Addr:           cnf.addr,
+		MaxHeaderBytes: 524288,
+		ErrorLog:       errorLog,
+		Handler:        app.routes(),
+		IdleTimeout:    time.Minute,
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   10 * time.Second,
 	}
 
 	infoLog.Printf("starting server on %s", cnf.addr)

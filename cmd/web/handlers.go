@@ -65,6 +65,8 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := blogCreateForm{}
+	// this needs to be retrieved from session
+	// not from form
 	form.User_id = validator.CastUserId(r.PostForm.Get("user_id"))
 	form.Title = r.PostForm.Get("title")
 	form.Content = r.PostForm.Get("content")
