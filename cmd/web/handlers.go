@@ -131,6 +131,26 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (app *application) userSignUp(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "userSignUp")
+}
+
+func (app *application) userSignUpPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "userSignUpPost")
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "userLogin")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "userLoginPost")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "userLogoutPost")
+}
+
 // func (app *application) admin(w http.ResponseWriter, r *http.Request) {
 // if r.URL.Path != "/admin" {
 // app.notFound(w)

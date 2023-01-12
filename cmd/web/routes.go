@@ -19,12 +19,21 @@ func (app *application) routes() http.Handler {
 
 	dynamic := alice.New(app.SessionManager.LoadAndSave)
 
+	// home
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
+
+	// blogs routes
 	router.Handler(http.MethodGet, "/blog", dynamic.ThenFunc(app.blog))
 	router.Handler(http.MethodGet, "/blog/view/:id", dynamic.ThenFunc(app.blogView))
 	router.Handler(http.MethodGet, "/blog/create", dynamic.ThenFunc(app.blogCreate))
 	router.Handler(http.MethodPost, "/blog/create", dynamic.ThenFunc(app.blogCreatePost))
-	// router.HandlerFunc(http.MethodGet, "/admin", app.admin)
+
+	// user routes
+	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignUp))
+	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignUpPost))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLogin))
+	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
+	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(app.userLogoutPost))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 

@@ -8,7 +8,8 @@ import (
 type User struct {
 	User_id    int
 	UserName   string
-	Password   string
+	Password   []byte
+	Email      string
 	IsAdmin    bool
 	Created_at time.Time
 	Updated_at time.Time
@@ -32,6 +33,14 @@ func (m *UserModel) Insert(username string, password string, isAdmin bool) (int,
 	}
 
 	return int(id), nil
+}
+
+func (m *UserModel) Authenticate(email, password string) (int, error) {
+	return 0, nil
+}
+
+func (m *UserModel) Exists(id int) (bool, error) {
+	return false, nil
 }
 
 func (m *UserModel) Get(User_id int) (*User, error) {
