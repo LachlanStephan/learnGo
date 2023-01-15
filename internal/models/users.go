@@ -2,12 +2,18 @@ package models
 
 import (
 	"database/sql"
+	"errors"
+	"strings"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
 	User_id    int
-	UserName   string
+	FirstName  string
+	LastName   string
 	Password   []byte
 	Email      string
 	IsAdmin    bool
@@ -19,20 +25,26 @@ type UserModel struct {
 	DB *sql.DB
 }
 
-// Todo:
-// add hashing to password - see if this can be done in the std:: or if we need library (bcrypt)
-func (m *UserModel) Insert(username string, password string, isAdmin bool) (int, error) {
-	stmt := `INSERT INTO Users (UserName, Password, IsAdmin, Created_at) VALUES (?, ?, ?, UTC_TIMESTAMP())`
-	result, err := m.DB.Exec(stmt, username, password, isAdmin)
+func (m *UserModel) Insert(firstName, lastName, email, password string, isAdmin bool) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		return 0, err
-	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return int(id), nil
+	stmt := `INSERT INTO Users (FirstName, LastName, Email, Password, IsAdmin, Created_at) VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP())`
+
+	_, err = m.DB.Exec(stmt, firstName, lastName, email, string(hashedPassword), isAdmin)
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			if mysqlErr.Number == 1062 && strings.Contains(mysqlErr.Message, "user_email") {
+				return ErrDuplicateEmail
+			}
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m *UserModel) Authenticate(email, password string) (int, error) {
@@ -40,7 +52,13 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {
-	return false, nil
+	stmt := `SELECT EXISTS(SELECT 1 FROM Users WHERE User_id = ?)`
+	exists := false
+	err := m.DB.QueryRow(stmt, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
 
 func (m *UserModel) Get(User_id int) (*User, error) {

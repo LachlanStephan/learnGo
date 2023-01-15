@@ -1,3 +1,10 @@
 {
-	"cSpell.words": ["httprouter", "mysqlstore", "signup", "tmpl"]
+	"cSpell.words": [
+		"firstname",
+		"httprouter",
+		"lastname",
+		"mysqlstore",
+		"signup",
+		"tmpl"
+	]
 }

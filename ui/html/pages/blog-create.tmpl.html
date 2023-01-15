@@ -5,7 +5,6 @@
 		{{with .Form.FormErrors.user_id}}
 		<label class="error">{{.}}</label>
 		{{end}}
-		<br />
 		<input type="text" name="user_id" value="{{.Form.User_id}}" />
 	</div>
 	<div>
@@ -13,7 +12,6 @@
 		{{with .Form.FormErrors.title}}
 		<label class="error">{{.}}</label>
 		{{end}}
-		<br />
 		<input type="text" name="title" value="{{.Form.Title}}" />
 	</div>
 	<div>
@@ -21,7 +19,6 @@
 		{{with .Form.FormErrors.content}}
 		<label class="error">{{.}}</label>
 		{{end}}
-		<br />
 		<textarea name="content">{{.Form.Content}}</textarea>
 	</div>
 	<div>

@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS Users;
 CREATE TABLE Users (
     User_id int NOT NULL AUTO_INCREMENT,
-    UserName varchar(255),
+    FirstName varchar(255),
+    LastName varchar(255),
     Password varchar(255),
     IsAdmin tinyint,
     Created_at timestamp,
