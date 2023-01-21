@@ -11,11 +11,12 @@ import (
 // list of templates used across the site
 // can compose multiple sets of data here
 type templateData struct {
-	Blog        *models.Blog
-	BlogLinks   []*models.BlogLink
-	CurrentYear int
-	Form        any
-	Flash       string
+	Blog            *models.Blog
+	BlogLinks       []*models.BlogLink
+	CurrentYear     int
+	Form            any
+	Flash           string
+	IsAuthenticated bool
 }
 
 func formatCreatedAt(t time.Time) string {

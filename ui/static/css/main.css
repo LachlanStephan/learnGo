@@ -8,6 +8,16 @@ body {
 	width: 50%;
 }
 
+nav {
+	display: flex;
+	justify-content: space-between;
+}
+
+.user-actions-container {
+	display: flex;
+	gap: 0.5rem;
+}
+
 pre {
 	background-color: lightgray;
 	padding: 0.5rem;

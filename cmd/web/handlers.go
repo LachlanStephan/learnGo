@@ -26,6 +26,12 @@ type userSignUpForm struct {
 	validator.Validator
 }
 
+type userLoginForm struct {
+	Email    string
+	Password string
+	validator.Validator
+}
+
 func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	id, err := strconv.Atoi(params.ByName("id"))
@@ -134,9 +140,10 @@ func (app *application) blog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "blog.tmpl.html", &templateData{
-		BlogLinks: blogs,
-	})
+	data := app.newTemplateData(r)
+	data.BlogLinks = blogs
+
+	app.render(w, http.StatusOK, "blog.tmpl.html", data)
 }
 
 func (app *application) userSignUp(w http.ResponseWriter, r *http.Request) {
@@ -194,33 +201,70 @@ func (app *application) userSignUpPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "userLogin")
+	data := app.newTemplateData(r)
+	data.Form = userLoginForm{}
+	app.render(w, http.StatusOK, "login.tmpl.html", data)
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "userLoginPost")
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := userLoginForm{}
+
+	form.Email = r.PostForm.Get("email")
+	form.Password = r.PostFormValue("password")
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		return
+	}
+
+	id, err := app.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	err = app.SessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.SessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "userLogoutPost")
+	err := app.SessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.SessionManager.Remove(r.Context(), "authenticatedUserID")
+
+	app.SessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
-// func (app *application) admin(w http.ResponseWriter, r *http.Request) {
-// if r.URL.Path != "/admin" {
-// app.notFound(w)
-// return
-// }
-
-// app.render(w, http.StatusOK, "admin.tmpl.html", nil)
-// /*
-// this will be an admin view
-// just get the right templates/html and show it
-// */
-// }
-
-// func (app *application) adminLogin(password string) bool {
-// 	return false
-/*
-	hash password and see if matches the db for admin user
-*/
-// }
