@@ -75,17 +75,10 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {
-	stmt := `SELECT EXISTS(SELECT 1 FROM Users WHERE User_id = ?)`
 	exists := false
+	stmt := `SELECT EXISTS(SELECT 1 FROM Users WHERE User_id = ?)`
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
-	if err != nil {
-		return false, err
-	}
-	return exists, nil
-}
-
-func (m *UserModel) Get(User_id int) (*User, error) {
-	return nil, nil
+	return exists, err
 }
 
 func (m *UserModel) GetAdminUsers() ([]int, error) {

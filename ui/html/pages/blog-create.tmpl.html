@@ -1,12 +1,6 @@
 {{define "title"}}Create a Blog{{end}} {{define "main"}}
 <form action="/blog/create" method="POST">
-	<div>
-		<label>User id:</label>
-		{{with .Form.FormErrors.user_id}}
-		<label class="error">{{.}}</label>
-		{{end}}
-		<input type="text" name="user_id" value="{{.Form.User_id}}" />
-	</div>
+	<input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
 	<div>
 		<label>title:</label>
 		{{with .Form.FormErrors.title}}
@@ -26,7 +20,3 @@
 	</div>
 </form>
 {{end}}
-<!--
-  TODO:
-  Need to get rid of user_id field -> this can done once auth code is added and we can check user_id via session
--->

@@ -106,7 +106,7 @@ func (m *BlogModel) Recent() ([]*BlogLink, error) {
 
 func (m *BlogModel) Get(id int) (*Blog, error) {
 	b := &Blog{}
-	stmt := `SELECT Blogs.Blog_id, Blogs.User_id, Blogs.Title, Blogs.Content, Blogs.Created_at, Blogs.Updated_at, Users.FirstName, Users.LastName FROM blogs JOIN Users ON Blogs.User_id = Users.User_id WHERE Blog_id = ? AND Users.User_id = 1`
+	stmt := `SELECT Blogs.Blog_id, Blogs.User_id, Blogs.Title, Blogs.Content, Blogs.Created_at, Blogs.Updated_at, Users.FirstName, Users.LastName FROM blogs JOIN Users ON Blogs.User_id = Users.User_id WHERE Blog_id = ?`
 
 	err := m.DB.QueryRow(stmt, id).Scan(&b.Blog_id, &b.User_id, &b.Title, &b.Content, &b.Created_at, &b.Updated_at, &b.FirstName, &b.LastName)
 

@@ -4,6 +4,7 @@
 		"httprouter",
 		"lastname",
 		"mysqlstore",
+		"nosurf",
 		"signup",
 		"tmpl"
 	]

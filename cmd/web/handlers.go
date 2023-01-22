@@ -57,16 +57,8 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) blogCreate(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// check that the user is logged in here
-	// if not
-	// redirect them to login page
-	// this can be done once auth is implemented
-
 	data := app.newTemplateData(r)
-	data.Form = blogCreateForm{
-		User_id: 1, // replace hardcoded id with id from session
-	}
+	data.Form = blogCreateForm{}
 
 	app.render(w, http.StatusOK, "blog-create.tmpl.html", data)
 }
@@ -79,9 +71,8 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := blogCreateForm{}
-	// this needs to be retrieved from session
-	// not from form
-	form.User_id = validator.CastUserId(r.PostForm.Get("user_id"))
+
+	form.User_id = app.getAuthenticatedUserId(r)
 	form.Title = r.PostForm.Get("title")
 	form.Content = r.PostForm.Get("content")
 
@@ -91,7 +82,13 @@ func (app *application) blogCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.CheckField(validator.ValidUserId(form.User_id, validPublishers), "user_id", "You do not have permission to publish")
+	if !validator.ValidUserId(form.User_id, validPublishers) {
+		app.SessionManager.Put(r.Context(), "flash", "You must be an admin to create blogs")
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 50), "title", "Title cannot have more than 50 chars")
 	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")

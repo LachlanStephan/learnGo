@@ -55,7 +55,7 @@ func Matches(value string, rx *regexp.Regexp) bool {
 	return rx.MatchString(value)
 }
 
-func PermittedInt(targetValue int, permittedValues ...int) bool {
+func PermittedValue[T comparable](targetValue T, permittedValues ...T) bool {
 	for i := range permittedValues {
 		if targetValue == permittedValues[i] {
 			return true
@@ -73,11 +73,11 @@ func CastUserId(userId string) int {
 }
 
 func ValidUserId(userId int, validUsers []int) bool {
-	if userId == 0 && !isInt(userId) {
+	if userId == 0 || !isInt(userId) {
 		return false
 	}
 
-	return PermittedInt(userId, validUsers...)
+	return PermittedValue(userId, validUsers...)
 }
 
 func isInt(n any) bool {
