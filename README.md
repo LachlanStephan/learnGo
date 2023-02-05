@@ -1,3 +1,3 @@
-# TODO
+# About
 
-decide on whether this becomes main site
+This is a local only project used to learn Go
